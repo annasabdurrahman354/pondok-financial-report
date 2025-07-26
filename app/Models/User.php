@@ -2,47 +2,70 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasName;
+use Filament\Panel;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser, HasName
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasPanelShield, HasRoles;
+    use Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
-        'name',
+        'nama',
         'email',
+        'nomor_telepon',
         'password',
+        'pondok_id',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
+
+    public function getFilamentName(): string
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->nama;
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->hasRole([\App\Enums\Role::SUPER_ADMIN->value, \App\Enums\Role::ADMIN_PUSAT->value, \App\Enums\Role::ADMIN_PONDOK->value]);
+    }
+
+    public function pondok(): BelongsTo
+    {
+        return $this->belongsTo(Pondok::class);
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->hasRole(\App\Enums\Role::SUPER_ADMIN);
+    }
+
+
+    public function isAdminPusat(): bool
+    {
+        if ($this->hasRole(\App\Enums\Role::SUPER_ADMIN)) {
+            return true;
+        }
+
+        return $this->hasRole(\App\Enums\Role::ADMIN_PUSAT);
+    }
+
+    public function isAdminPondok(): bool
+    {
+        return $this->hasRole(\App\Enums\Role::ADMIN_PONDOK);
     }
 }
