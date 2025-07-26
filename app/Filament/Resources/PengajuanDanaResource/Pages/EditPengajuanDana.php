@@ -1,0 +1,88 @@
+<?php
+
+namespace App\Filament\Resources\PengajuanDanaResource\Pages;
+
+use App\Filament\Resources\PengajuanDanaResource;
+use App\Models\PengajuanDana;
+use Filament\Actions\Action;
+use Filament\Notifications\Notification;
+use Filament\Resources\Pages\EditRecord;
+
+class EditPengajuanDana extends EditRecord
+{
+    protected static string $resource = PengajuanDanaResource::class;
+    protected string $recordStatus = 'diajukan';
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('view', ['record' => $this->record]);
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('back')
+                ->label('Kembali')
+                ->url($this->getResource()::getUrl('index'))
+                ->color('gray'),
+        ];
+    }
+
+    protected function getFormActions(): array
+    {
+        return [
+            $this->getSaveFormAction()
+                ->label(fn (PengajuanDana $record) => $record->isDrafted() ? 'Ajukan' : 'Ajukan Kembali'),
+
+            Action::make('saveAsDraft')
+                ->label('Simpan sebagai Draft')
+                ->color('gray')
+                ->action(function (PengajuanDana $record) {
+                    if ($record->status == 'revisi') {
+                        $this->recordStatus = 'revisi';
+
+                    }
+                    else{
+                        $this->recordStatus = 'draft';
+                    }
+                    $this->save();
+                })
+                ->visible(fn (PengajuanDana $record) => $record->isDrafted() || $record->needsRevision()),
+
+            $this->getCancelFormAction(),
+        ];
+    }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        $data['status'] = $this->recordStatus;
+        // Only clear pesan_revisi when submitting (not when saving as draft)
+        if ($this->recordStatus === 'diajukan') {
+            $data['pesan_revisi'] = null;
+        }
+
+        return $data;
+    }
+
+    protected function getSavedNotification(): ?Notification
+    {
+        if ($this->recordStatus === 'draft') {
+            return Notification::make()
+                ->success()
+                ->title('Pengajuan Dana berhasil disimpan sebagai draft')
+                ->body('Pengajuan Dana telah disimpan dan dapat diedit kembali nanti.');
+        }
+
+        if ($this->recordStatus === 'revisi') {
+            return Notification::make()
+                ->success()
+                ->title('Pengajuan Dana berhasil disimpan')
+                ->body('Revisi LPJ telah disimpan dan dapat diedit kembali nanti.');
+        }
+
+        return Notification::make()
+            ->success()
+            ->title('Pengajuan Dana berhasil direvisi')
+            ->body('Pengajuan Dana telah berhasil direvisi dan diajukan kembali.');
+    }
+}
