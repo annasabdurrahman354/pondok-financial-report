@@ -4,7 +4,9 @@ namespace Database\Seeders;
 
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Filament\Facades\Filament;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Artisan;
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,9 +17,20 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        $this->call([
+            RolesAndPermissionsSeeder::class,
+            UserSeeder::class,
+            KategoriPemasukanSeeder::class,
+            KategoriPengeluaranSeeder::class
         ]);
+
+        $panels = Filament::getPanels();
+        foreach ($panels as $panelId => $panel) {
+            Filament::setCurrentPanel($panel);
+            Artisan::call('shield:generate', [
+                '--all' => true,
+                '--panel' => $panelId,
+            ]);
+        }
     }
 }
