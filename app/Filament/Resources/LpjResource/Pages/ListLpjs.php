@@ -100,4 +100,11 @@ class ListLpjs extends ListRecords
             return $periodeId;
         }
     }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            LpjResource\Widgets\LpjStatsWidget::class,
+        ];
+    }
 }

@@ -99,4 +99,11 @@ class ListRabs extends ListRecords
             return $periodeId;
         }
     }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            RabResource\Widgets\RabStatsWidget::class,
+        ];
+    }
 }

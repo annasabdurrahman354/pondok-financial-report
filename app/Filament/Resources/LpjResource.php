@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Enums\LaporanStatus;
 use App\Filament\Forms\Components\BadgePlaceholder;
 use App\Filament\Resources\LpjResource\Pages;
+use App\Filament\Resources\LpjResource\Widgets\LpjStatsWidget;
 use App\Models\KategoriPemasukan;
 use App\Models\KategoriPengeluaran;
 use App\Models\Lpj;
@@ -784,6 +785,13 @@ class LpjResource extends Resource
             ]);
     }
     */
+
+    public static function getWidgets(): array
+    {
+        return [
+            LpjStatsWidget::class,
+        ];
+    }
 
     public static function getPages(): array
     {

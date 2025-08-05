@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Enums\LaporanStatus;
 use App\Filament\Forms\Components\BadgePlaceholder;
 use App\Filament\Resources\RabResource\Pages;
+use App\Filament\Resources\RabResource\Widgets\RabStatsWidget;
 use App\Models\KategoriPemasukan;
 use App\Models\KategoriPengeluaran;
 use App\Models\Lpj;
@@ -479,6 +480,14 @@ class RabResource extends Resource
                     ->icon('heroicon-o-trash')
                     ->visible(fn (Rab $record) => auth()->user()->isAdminPusat() && !$record->isAccepted()),
             ]);
+    }
+
+
+    public static function getWidgets(): array
+    {
+        return [
+            RabStatsWidget::class,
+        ];
     }
 
     public static function getRelations(): array
