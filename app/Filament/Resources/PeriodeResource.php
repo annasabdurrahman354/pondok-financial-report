@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PeriodeResource\Pages;
+use App\Filament\Resources\PeriodeResource\RelationManagers;
 use App\Models\Periode;
 use Carbon\Carbon;
 use Filament\Forms;
@@ -182,7 +183,8 @@ class PeriodeResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\RabLpjRelationManager::class,
+            RelationManagers\PondokLaporanRelationManager::class,
         ];
     }
 
@@ -190,7 +192,7 @@ class PeriodeResource extends Resource
     {
         return [
             'index' => Pages\ListPeriodes::route('/'),
-            'view' => Pages\ViewPeriode::route('/{record}/view'),
+            'view' => Pages\ViewPeriode::route('/{record}'),
             'create' => Pages\CreatePeriode::route('/create'),
             'edit' => Pages\EditPeriode::route('/{record}/edit'),
         ];

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 
 class Periode extends Model
@@ -28,6 +29,16 @@ class Periode extends Model
     public function lpjs()
     {
         return $this->hasMany(Lpj::class, 'periode_id', 'id');
+    }
+
+    protected function formattedPeriode(): Attribute
+    {
+        $year = substr($this->id, 0, 4);
+        $month = substr($this->id, 4, 2);
+
+        return Attribute::make(
+            get: fn () => \Carbon\Carbon::createFromFormat('m', $month)->format('F').' '.$year,
+        );
     }
 
     /**
