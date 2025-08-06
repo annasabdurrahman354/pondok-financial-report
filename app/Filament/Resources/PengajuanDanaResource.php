@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Enums\LaporanStatus;
 use App\Filament\Forms\Components\BadgePlaceholder;
 use App\Filament\Resources\PengajuanDanaResource\Pages;
+use App\Filament\Resources\PengajuanDanaResource\Widgets\PengajuanDanaStatsWidget;
 use App\Models\PengajuanDana;
 use App\Models\Pondok;
 use App\Models\Periode;
@@ -412,6 +413,13 @@ class PengajuanDanaResource extends Resource
     {
         return [
             //
+        ];
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            PengajuanDanaStatsWidget::class,
         ];
     }
 

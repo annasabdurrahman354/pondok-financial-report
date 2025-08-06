@@ -315,6 +315,11 @@ class LpjStatsWidget extends BaseStatsOverviewWidget
 
     protected function getColumns(): int
     {
+        $periode = Periode::getPeriodeLpjAktif();
+
+        if (!$periode) {
+            return 3;
+        }
         return 4; // This sets the number of columns to 4
     }
 }

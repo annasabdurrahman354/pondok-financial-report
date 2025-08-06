@@ -99,4 +99,11 @@ class ListPengajuanDanas extends ListRecords
             return $periodeId;
         }
     }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            PengajuanDanaResource\Widgets\PengajuanDanaStatsWidget::class,
+        ];
+    }
 }
