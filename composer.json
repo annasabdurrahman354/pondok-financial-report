@@ -8,13 +8,12 @@
     "require": {
         "php": "^8.2",
         "awcodes/light-switch": "^1.0",
-        "bezhansalleh/filament-exceptions": "^3.0",
-        "bezhansalleh/filament-shield": "^3.3",
-        "cwsps154/app-settings": "^1.0",
+        "bezhansalleh/filament-exceptions": "2.1.2",
+        "bezhansalleh/filament-shield": "^3.3.4",
         "filament/filament": "^3.3",
-        "hasnayeen/themes": "^3.0",
         "laravel/framework": "12.19.3",
         "laravel/tinker": "^2.10.1",
+        "maatwebsite/excel": "^3.1",
         "marcelweidum/filament-expiration-notice": "^1.0"
     },
     "require-dev": {

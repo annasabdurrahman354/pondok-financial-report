@@ -54,7 +54,6 @@ class User extends Authenticatable implements FilamentUser, HasName
         return $this->hasRole(\App\Enums\Role::SUPER_ADMIN);
     }
 
-
     public function isAdminPusat(): bool
     {
         if ($this->hasRole(\App\Enums\Role::SUPER_ADMIN)) {
@@ -68,4 +67,14 @@ class User extends Authenticatable implements FilamentUser, HasName
     {
         return $this->hasRole(\App\Enums\Role::ADMIN_PONDOK);
     }
+
+    protected static function booted()
+    {
+        static::created(function ($user) {
+            if ($user->pondok_id) {
+                $user->assignRole(\App\Enums\Role::ADMIN_PONDOK);
+            }
+        });
+    }
+
 }
