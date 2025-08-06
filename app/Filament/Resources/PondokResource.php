@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\Jabatan;
 use App\Enums\PondokStatus;
 use App\Models\Pondok;
 use Filament\Forms;
@@ -12,6 +13,7 @@ use Filament\Tables\Table;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
 use App\Filament\Resources\PondokResource\Pages;
+use Illuminate\Support\Facades\Hash;
 
 class PondokResource extends Resource
 {
@@ -87,6 +89,116 @@ class PondokResource extends Resource
                             ->columnSpan(1),
                     ])
                     ->columns(2),
+
+                Forms\Components\Section::make('Pengurus Pondok')
+                    ->schema([
+                        Forms\Components\Repeater::make('pengurusPondok')
+                            ->relationship('pengurusPondok')
+                            ->schema([
+                                Forms\Components\TextInput::make('nama')
+                                    ->label('Nama Pengurus')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->columnSpan(2),
+
+                                Forms\Components\TextInput::make('nomor_telepon')
+                                    ->label('Nomor Telepon')
+                                    ->tel()
+                                    ->maxLength(15)
+                                    ->columnSpan(1),
+
+                                Forms\Components\Select::make('jabatan')
+                                    ->label('Jabatan')
+                                    ->required()
+                                    ->options(Jabatan::class)
+                                    ->columnSpan(1)
+                                    ->rules([
+                                        function () {
+                                            return function (string $attribute, $value, \Closure $fail) {
+                                                // Check if KETUA_PONDOK is being selected
+                                                if ($value == Jabatan::KETUA_PONDOK->value) {
+                                                    // Get the current form state
+                                                    $livewire = \Livewire\Livewire::current();
+                                                    $data = $livewire->form->getState();
+
+                                                    // Count how many KETUA_PONDOK already exist
+                                                    $ketuaCount = 0;
+                                                    if (isset($data['pengurusPondok'])) {
+                                                        foreach ($data['pengurusPondok'] as $pengurus) {
+                                                            if (isset($pengurus['jabatan']) && $pengurus['jabatan'] == Jabatan::KETUA_PONDOK->value) {
+                                                                $ketuaCount++;
+                                                            }
+                                                        }
+                                                    }
+
+                                                    if ($ketuaCount > 1) {
+                                                        $fail('Hanya boleh ada satu Ketua Pondok.');
+                                                    }
+                                                }
+                                            };
+                                        },
+                                    ]),
+                            ])
+                            ->columns(4)
+                            ->addActionLabel('Tambah Pengurus')
+                            ->itemLabel(fn (array $state): ?string => $state['nama'] ?? null)
+                            ->collapsed()
+                            ->deletable(fn (Forms\Get $get): bool => count($get('pengurusPondok') ?? []) > 1)
+                            ->deleteAction(
+                                fn (Forms\Components\Actions\Action $action) => $action
+                                    ->requiresConfirmation()
+                                    ->modalHeading('Hapus Pengurus Pondok')
+                                    ->modalDescription('Apakah Anda yakin ingin menghapus pengurus ini?')
+                            ),
+                    ]),
+
+                Forms\Components\Section::make('Admin Pondok')
+                    ->schema([
+                        Forms\Components\Repeater::make('users')
+                            ->relationship('users')
+                            ->schema([
+                                Forms\Components\TextInput::make('nama')
+                                    ->label('Nama Admin')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->columnSpan(1),
+
+                                Forms\Components\TextInput::make('email')
+                                    ->label('Email')
+                                    ->email()
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->unique('users', 'email', ignoreRecord: true)
+                                    ->columnSpan(1),
+
+                                Forms\Components\TextInput::make('nomor_telepon')
+                                    ->label('Nomor Telepon')
+                                    ->tel()
+                                    ->unique('users', 'nomor_telepon', ignoreRecord: true)
+                                    ->maxLength(15)
+                                    ->columnSpan(1),
+
+                                Forms\Components\TextInput::make('password')
+                                    ->label('Password')
+                                    ->password()
+                                    ->required(fn (string $context): bool => $context === 'create')
+                                    ->dehydrated(fn ($state) => filled($state))
+                                    ->dehydrateStateUsing(fn ($state) => Hash::make($state))
+                                    ->columnSpan(1),
+                            ])
+                            ->columns(4)
+                            ->addActionLabel('Tambah Admin')
+                            ->itemLabel(fn (array $state): ?string => $state['nama'] ?? null)
+                            ->collapsed()
+                            ->minItems(1) // Ensure at least one admin exists
+                            ->deletable(fn (Forms\Get $get): bool => count($get('users') ?? []) > 1)
+                            ->deleteAction(
+                                fn (Forms\Components\Actions\Action $action) => $action
+                                    ->requiresConfirmation()
+                                    ->modalHeading('Hapus Admin Pondok')
+                                    ->modalDescription('Apakah Anda yakin ingin menghapus admin ini? Pastikan masih ada minimal satu admin untuk pondok ini.')
+                            ),
+                    ]),
             ]);
     }
 
@@ -198,6 +310,55 @@ class PondokResource extends Resource
                     ])
                     ->columns(2),
 
+                Infolists\Components\Section::make('Pengurus Pondok')
+                    ->schema([
+                        Infolists\Components\RepeatableEntry::make('pengurusPondok')
+                            ->hiddenLabel()
+                            ->schema([
+                                Infolists\Components\TextEntry::make('nama')
+                                    ->label('Nama')
+                                    ->columnSpan(2),
+
+                                Infolists\Components\TextEntry::make('nomor_telepon')
+                                    ->label('Telepon')
+                                    ->columnSpan(1),
+
+                                Infolists\Components\TextEntry::make('jabatan')
+                                    ->badge()
+                                    ->columnSpan(1),
+                            ])
+                            ->columns(4)
+                            ->contained(false),
+                    ])
+                    ->collapsible(),
+
+                Infolists\Components\Section::make('Admin Pondok')
+                    ->schema([
+                        Infolists\Components\RepeatableEntry::make('users')
+                            ->hiddenLabel()
+                            ->schema([
+                                Infolists\Components\TextEntry::make('nama')
+                                    ->label('Nama')
+                                    ->columnSpan(1),
+
+                                Infolists\Components\TextEntry::make('email')
+                                    ->label('Email')
+                                    ->columnSpan(1),
+
+                                Infolists\Components\TextEntry::make('nomor_telepon')
+                                    ->label('Telepon')
+                                    ->columnSpan(1),
+
+                                Infolists\Components\TextEntry::make('created_at')
+                                    ->label('Dibuat')
+                                    ->dateTime('d/m/Y H:i')
+                                    ->columnSpan(1),
+                            ])
+                            ->columns(4)
+                            ->contained(false),
+                    ])
+                    ->collapsible(),
+
                 Infolists\Components\Section::make('Informasi Sistem')
                     ->schema([
                         Infolists\Components\TextEntry::make('created_at')
@@ -214,7 +375,6 @@ class PondokResource extends Resource
                     ->collapsible(),
             ]);
     }
-
     public static function getRelations(): array
     {
         return [
