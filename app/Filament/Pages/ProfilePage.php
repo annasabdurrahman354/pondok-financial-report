@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists;
@@ -16,7 +17,9 @@ use Illuminate\Validation\Rule;
 
 class ProfilePage extends Page
 {
-    protected static ?string $slug = 'profile';
+    use HasPageShield;
+
+    protected static ?string $slug = 'user-profile';
     protected static ?string $navigationIcon = 'heroicon-o-user-circle';
     protected static ?string $navigationLabel = 'Profil';
     protected static ?int $navigationSort = 99;
