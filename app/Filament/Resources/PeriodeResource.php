@@ -192,8 +192,8 @@ class PeriodeResource extends Resource
     {
         return [
             'index' => Pages\ListPeriodes::route('/'),
-            'view' => Pages\ViewPeriode::route('/{record}'),
             'create' => Pages\CreatePeriode::route('/create'),
+            'view' => Pages\ViewPeriode::route('/{record}'),
             'edit' => Pages\EditPeriode::route('/{record}/edit'),
         ];
     }

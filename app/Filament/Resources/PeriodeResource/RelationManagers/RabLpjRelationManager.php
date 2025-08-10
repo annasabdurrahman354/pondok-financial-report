@@ -43,21 +43,7 @@ class RabLpjRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('rab_status')
                     ->label('Status RAB')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'Belum Mengisi' => 'gray',
-                        'DRAFT' => 'warning',
-                        'DIAJUKAN' => 'info',
-                        'DITERIMA' => 'success',
-                        'REVISI' => 'danger',
-                        default => 'gray',
-                    })
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'DRAFT' => 'Draft',
-                        'DIAJUKAN' => 'Diajukan',
-                        'DITERIMA' => 'Diterima',
-                        'REVISI' => 'Revisi',
-                        default => $state,
-                    }),
+                    ->color(LaporanStatus::class),
 
                 Tables\Columns\TextColumn::make('rab_total_pemasukan')
                     ->label('RAB Pemasukan')
@@ -78,21 +64,7 @@ class RabLpjRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('lpj_status')
                     ->label('Status LPJ')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'Belum Mengisi' => 'gray',
-                        'DRAFT' => 'warning',
-                        'DIAJUKAN' => 'info',
-                        'DITERIMA' => 'success',
-                        'REVISI' => 'danger',
-                        default => 'gray',
-                    })
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'DRAFT' => 'Draft',
-                        'DIAJUKAN' => 'Diajukan',
-                        'DITERIMA' => 'Diterima',
-                        'REVISI' => 'Revisi',
-                        default => $state,
-                    }),
+                    ->color(LaporanStatus::class),
 
                 Tables\Columns\TextColumn::make('lpj_total_pemasukan_realisasi')
                     ->label('LPJ Pemasukan')
@@ -123,23 +95,11 @@ class RabLpjRelationManager extends RelationManager
             ->filters([
                 Tables\Filters\SelectFilter::make('rab_status')
                     ->label('Filter RAB Status')
-                    ->options([
-                        'Belum Mengisi' => 'Belum Mengisi',
-                        'DRAFT' => 'Draft',
-                        'DIAJUKAN' => 'Diajukan',
-                        'DITERIMA' => 'Diterima',
-                        'REVISI' => 'Revisi',
-                    ]),
+                    ->options(LaporanStatus::class),
 
                 Tables\Filters\SelectFilter::make('lpj_status')
                     ->label('Filter LPJ Status')
-                    ->options([
-                        'Belum Mengisi' => 'Belum Mengisi',
-                        'DRAFT' => 'Draft',
-                        'DIAJUKAN' => 'Diajukan',
-                        'DITERIMA' => 'Diterima',
-                        'REVISI' => 'Revisi',
-                    ]),
+                    ->options(LaporanStatus::class),
             ])
             ->headerActions([
                 // No create action needed

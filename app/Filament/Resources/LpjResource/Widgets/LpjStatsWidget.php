@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\LpjResource\Widgets;
 
+use App\Filament\Resources\LpjResource;
 use App\Models\Lpj;
 use App\Models\Pondok;
 use App\Models\Periode;
@@ -100,8 +101,8 @@ class LpjStatsWidget extends BaseStatsOverviewWidget
                 ->descriptionIcon('heroicon-m-exclamation-triangle')
                 ->color('warning');
         } else {
-            $daysLeft = Carbon::parse($periode->batas_akhir_lpj)->diffInDays(Carbon::now());
-            $stats[] = Stat::make('Periode Aktif', $daysLeft . ' hari tersisa')
+            $daysLeft = Carbon::parse($periode->batas_akhir_lpj)->diffForHumans();
+            $stats[] = Stat::make('Periode Aktif', 'Berakhir ' . $daysLeft)
                 ->description('Berakhir: ' . Carbon::parse($periode->batas_akhir_lpj)->format('d M Y'))
                 ->descriptionIcon('heroicon-m-clock')
                 ->color($daysLeft <= 3 ? 'danger' : ($daysLeft <= 7 ? 'warning' : 'success'));
@@ -162,8 +163,8 @@ class LpjStatsWidget extends BaseStatsOverviewWidget
                 ->descriptionIcon('heroicon-m-clock')
                 ->color('info');
         } else {
-            $daysLeft = Carbon::parse($periode->batas_akhir_lpj)->diffInDays(Carbon::now());
-            $stats[] = Stat::make('Periode Aktif', $daysLeft . ' hari tersisa')
+            $daysLeft = Carbon::parse($periode->batas_akhir_lpj)->diffForHumans();
+            $stats[] = Stat::make('Periode Aktif', 'Berakhir ' . $daysLeft)
                 ->description('Berakhir: ' . Carbon::parse($periode->batas_akhir_lpj)->format('d M Y'))
                 ->descriptionIcon('heroicon-m-clock')
                 ->color($daysLeft <= 3 ? 'danger' : ($daysLeft <= 7 ? 'warning' : 'success'));
@@ -239,45 +240,16 @@ class LpjStatsWidget extends BaseStatsOverviewWidget
                     ->description('Data LPJ diperlukan')
                     ->descriptionIcon('heroicon-m-document-plus')
                     ->color('danger')
-                    ->url(route('filament.admin.resources.lpjs.create'));
+                    ->url(LpjResource::getUrl('create'));
             } else {
                 $stats[] = Stat::make('Persiapan', 'Tunggu Periode Aktif')
                     ->description('Siapkan dokumen LPJ')
                     ->descriptionIcon('heroicon-m-document-text')
                     ->color('info');
             }
-
-            // Fill remaining stats with placeholder/info stats
-            $stats[] = Stat::make('RAB Periode Ini', $rab ? 'Tersedia' : 'Tidak Ada')
-                ->description($rab ? 'Rp ' . number_format($rab->total_pemasukan, 0, ',', '.') . ' rencana' : 'Perlu RAB untuk referensi')
-                ->descriptionIcon('heroicon-m-document-chart-bar')
-                ->color($rab ? 'info' : 'warning');
-
-            $stats[] = Stat::make('Panduan', 'Siapkan Bukti')
-                ->description('Kumpulkan dokumen pendukung')
-                ->descriptionIcon('heroicon-m-folder')
-                ->color('info');
-
-            $stats[] = Stat::make('Reminder', 'Cek Kelengkapan')
-                ->description('Pastikan semua data lengkap')
-                ->descriptionIcon('heroicon-m-clipboard-document-check')
-                ->color('info');
-
-            $stats[] = Stat::make('Tips', 'Input Realisasi')
-                ->description('Masukkan data aktual pengeluaran')
-                ->descriptionIcon('heroicon-m-light-bulb')
-                ->color('info');
         }
 
-        // Ensure we always have 8 stats by adding padding if needed
-        while (count($stats) < 8) {
-            $stats[] = Stat::make('Info', 'Data tidak tersedia')
-                ->description('Periode belum aktif')
-                ->descriptionIcon('heroicon-m-information-circle')
-                ->color('gray');
-        }
-
-        return array_slice($stats, 0, 8); // Ensure exactly 8 stats
+        return $stats; // Ensure exactly 8 stats
     }
 
     private function getStatusLabel($status): string
@@ -315,11 +287,6 @@ class LpjStatsWidget extends BaseStatsOverviewWidget
 
     protected function getColumns(): int
     {
-        $periode = Periode::getPeriodeLpjAktif();
-
-        if (!$periode) {
-            return 3;
-        }
         return 4; // This sets the number of columns to 4
     }
 }

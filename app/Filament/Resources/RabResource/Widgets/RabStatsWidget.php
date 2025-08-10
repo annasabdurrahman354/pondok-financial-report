@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\RabResource\Widgets;
 
+use App\Filament\Resources\RabResource;
 use App\Models\Rab;
 use App\Models\Pondok;
 use App\Models\Periode;
@@ -81,8 +82,8 @@ class RabStatsWidget extends BaseStatsOverviewWidget
                 ->descriptionIcon('heroicon-m-exclamation-triangle')
                 ->color('warning');
         } else {
-            $daysLeft = Carbon::parse($periode->batas_akhir_rab)->diffInDays(Carbon::now());
-            $stats[] = Stat::make('Periode Aktif', $daysLeft . ' hari tersisa')
+            $daysLeft = Carbon::parse($periode->batas_akhir_rab)->diffForHumans();
+            $stats[] = Stat::make('Periode Aktif', 'Berakhir ' . $daysLeft)
                 ->description('Berakhir: ' . Carbon::parse($periode->batas_akhir_rab)->format('d M Y'))
                 ->descriptionIcon('heroicon-m-clock')
                 ->color($daysLeft <= 3 ? 'danger' : ($daysLeft <= 7 ? 'warning' : 'success'));
@@ -133,8 +134,8 @@ class RabStatsWidget extends BaseStatsOverviewWidget
                 ->descriptionIcon('heroicon-m-clock')
                 ->color('info');
         } else {
-            $daysLeft = Carbon::parse($periode->batas_akhir_rab)->diffInDays(Carbon::now());
-            $stats[] = Stat::make('Periode Aktif', $daysLeft . ' hari tersisa')
+            $daysLeft = Carbon::parse($periode->batas_akhir_rab)->diffForHumans();
+            $stats[] = Stat::make('Periode Aktif', 'Berakhir ' . $daysLeft)
                 ->description('Berakhir: ' . Carbon::parse($periode->batas_akhir_rab)->format('d M Y'))
                 ->descriptionIcon('heroicon-m-clock')
                 ->color($daysLeft <= 3 ? 'danger' : ($daysLeft <= 7 ? 'warning' : 'success'));
@@ -179,7 +180,7 @@ class RabStatsWidget extends BaseStatsOverviewWidget
                     ->description('Data RAB diperlukan')
                     ->descriptionIcon('heroicon-m-document-plus')
                     ->color('danger')
-                    ->url(route('filament.admin.resources.rabs.create'));
+                    ->url(RabResource::getUrl('create'));
             }
         }
 
@@ -217,5 +218,10 @@ class RabStatsWidget extends BaseStatsOverviewWidget
             LaporanStatus::REVISI => 'danger',
             default => 'gray'
         };
+    }
+
+    protected function getColumns(): int
+    {
+        return 3; // This sets the number of columns to 4
     }
 }

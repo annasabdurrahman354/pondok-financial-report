@@ -80,10 +80,6 @@ class PondokLaporanRelationManager extends RelationManager
                     )
                     ->query(function (Builder $query, array $data) {
                         $status = $data['value'];
-                        if ($status === null) {
-                            return;
-                        }
-
                         if ($status === 'belum_mengisi') {
                             return $query->whereDoesntHave('rab', fn (Builder $q) => $q->where('periode_id', $this->ownerRecord->id));
                         }
@@ -100,9 +96,6 @@ class PondokLaporanRelationManager extends RelationManager
                     )
                     ->query(function (Builder $query, array $data) {
                         $status = $data['value'];
-                        if ($status === null) {
-                            return;
-                        }
 
                         if ($status === 'belum_mengisi') {
                             return $query->whereDoesntHave('lpj', fn (Builder $q) => $q->where('periode_id', $this->ownerRecord->id));
