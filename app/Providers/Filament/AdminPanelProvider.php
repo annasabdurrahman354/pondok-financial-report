@@ -3,6 +3,10 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\ProfilePage;
+use App\Filament\Widgets\AdminPusatLpjStatsWidget;
+use App\Filament\Widgets\AdminPusatPeriodePengajuanDanaStatsWidget;
+use App\Filament\Widgets\AdminPusatRabStatsWidget;
+use App\Filament\Widgets\SimpleExportWidget;
 use Awcodes\LightSwitch\LightSwitchPlugin;
 use BezhanSalleh\FilamentExceptions\Resources\ExceptionResource;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
@@ -44,9 +48,12 @@ class AdminPanelProvider extends PanelProvider
             ->pages([
                 Pages\Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
+                SimpleExportWidget::class,
+                AdminPusatPeriodePengajuanDanaStatsWidget::class,
+                AdminPusatRabStatsWidget::class,
+                AdminPusatLpjStatsWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,

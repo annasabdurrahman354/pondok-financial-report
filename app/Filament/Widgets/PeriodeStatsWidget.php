@@ -13,45 +13,96 @@ class PeriodeStatsWidget extends BaseWidget
 
     protected function getStats(): array
     {
-        // Get current period info
+        // Get current month period or latest period if current doesn't exist
         $currentPeriodId = Carbon::now()->format('Ym'); // Format: YYYYMM (e.g., 202501)
-        $currentPeriod = Periode::find($currentPeriodId);
-        $latestPeriod = Periode::latest('id')->first();
+        $periode = Periode::find($currentPeriodId);
 
-        // Check if current month period exists
-        $currentMonthExists = $currentPeriod !== null;
-
-        // Get timeline info for latest period
-        $timelineInfo = '';
-        $timelineColor = 'gray';
-        if ($latestPeriod) {
-            $mulai = Carbon::parse($latestPeriod->mulai);
-            $selesai = Carbon::parse($latestPeriod->selesai);
-            $now = Carbon::now();
-
-            if ($now->lt($mulai)) {
-                $timelineInfo = 'Belum dimulai (' . $mulai->diffForHumans() . ')';
-                $timelineColor = 'warning';
-            } elseif ($now->between($mulai, $selesai)) {
-                $timelineInfo = 'Sedang berjalan (berakhir ' . $selesai->diffForHumans() . ')';
-                $timelineColor = 'success';
-            } else {
-                $timelineInfo = 'Sudah berakhir (' . $selesai->diffForHumans() . ')';
-                $timelineColor = 'danger';
-            }
+        if (!$periode) {
+            $periode = Periode::latest('id')->first();
         }
 
-        return [
-            Stat::make('Periode Aktif Terakhir', $latestPeriod ? $latestPeriod->keterangan : 'Tidak ada')
-                ->description($timelineInfo)
-                ->descriptionIcon('heroicon-m-clock')
-                ->color($timelineColor),
+        $stats = [];
 
-            Stat::make('Periode Bulan Ini', $currentMonthExists ? 'Sudah dibuat' : 'Belum dibuat')
-                ->description('Periode: ' . Carbon::now()->format('F Y'))
-                ->descriptionIcon($currentMonthExists ? 'heroicon-m-check-circle' : 'heroicon-m-x-circle')
-                ->color($currentMonthExists ? 'success' : 'danger'),
-        ];
+        if ($periode) {
+            // RAB Stats
+            $now = Carbon::now();
+            $batasAwalRab = Carbon::parse($periode->batas_awal_rab);
+            $batasAkhirRab = Carbon::parse($periode->batas_akhir_rab);
+
+            $rabStatus = '';
+            $rabDescription = '';
+            $rabColor = 'gray';
+            $rabIcon = 'heroicon-m-document-text';
+
+            if ($now->lt($batasAwalRab)) {
+                $rabStatus = 'Belum Saatnya';
+                $rabDescription = 'Mulai ' . $batasAwalRab->format('d M Y') . ' (' . $batasAwalRab->diffForHumans() . ')';
+                $rabColor = 'warning';
+                $rabIcon = 'heroicon-m-clock';
+            } elseif ($now->between($batasAwalRab, $batasAkhirRab)) {
+                $rabStatus = 'Sedang Aktif';
+                $rabDescription = 'Berakhir ' . $batasAkhirRab->format('d M Y') . ' (' . $batasAkhirRab->diffForHumans() . ')';
+                $rabColor = 'success';
+                $rabIcon = 'heroicon-m-check-circle';
+            } else {
+                $rabStatus = 'Sudah Berakhir';
+                $rabDescription = 'Berakhir ' . $batasAkhirRab->format('d M Y') . ' (' . $batasAkhirRab->diffForHumans() . ')';
+                $rabColor = 'danger';
+                $rabIcon = 'heroicon-m-x-circle';
+            }
+
+            $stats[] = Stat::make('Periode RAB', $rabStatus)
+                ->description($rabDescription)
+                ->descriptionIcon($rabIcon)
+                ->color($rabColor);
+
+            // LPJ Stats
+            $batasAwalLpj = Carbon::parse($periode->batas_awal_lpj);
+            $batasAkhirLpj = Carbon::parse($periode->batas_akhir_lpj);
+
+            $lpjStatus = '';
+            $lpjDescription = '';
+            $lpjColor = 'gray';
+            $lpjIcon = 'heroicon-m-document-check';
+
+            if ($now->lt($batasAwalLpj)) {
+                $lpjStatus = 'Belum Saatnya';
+                $lpjDescription = 'Mulai ' . $batasAwalLpj->format('d M Y') . ' (' . $batasAwalLpj->diffForHumans() . ')';
+                $lpjColor = 'warning';
+                $lpjIcon = 'heroicon-m-clock';
+            } elseif ($now->between($batasAwalLpj, $batasAkhirLpj)) {
+                $lpjStatus = 'Sedang Aktif';
+                $lpjDescription = 'Berakhir ' . $batasAkhirLpj->format('d M Y') . ' (' . $batasAkhirLpj->diffForHumans() . ')';
+                $lpjColor = 'success';
+                $lpjIcon = 'heroicon-m-check-circle';
+            } else {
+                $lpjStatus = 'Sudah Berakhir';
+                $lpjDescription = 'Berakhir ' . $batasAkhirLpj->format('d M Y') . ' (' . $batasAkhirLpj->diffForHumans() . ')';
+                $lpjColor = 'danger';
+                $lpjIcon = 'heroicon-m-x-circle';
+            }
+
+            $stats[] = Stat::make('Periode LPJ', $lpjStatus)
+                ->description($lpjDescription)
+                ->descriptionIcon($lpjIcon)
+                ->color($lpjColor);
+
+        } else {
+            // No period found
+            $stats = [
+                Stat::make('Periode RAB', 'Tidak Ada Data')
+                    ->description('Belum ada periode yang tersedia')
+                    ->descriptionIcon('heroicon-m-exclamation-triangle')
+                    ->color('gray'),
+
+                Stat::make('Periode LPJ', 'Tidak Ada Data')
+                    ->description('Belum ada periode yang tersedia')
+                    ->descriptionIcon('heroicon-m-exclamation-triangle')
+                    ->color('gray'),
+            ];
+        }
+
+        return $stats;
     }
 
     protected function getColumns(): int
