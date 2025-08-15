@@ -80,7 +80,7 @@ class UserSeeder extends Seeder
                 'daerah_sambung' => 'Semarang Selatan',
             ],
             [
-                'nama' => 'PPPM Baitul A\'la Malang Kepanjen',
+                'nama' => "PPPM Baitul A'la Malang Kepanjen",
                 'status' => 'pppm',
                 'nomor_telepon' => '082189071653',
                 'alamat_lengkap' => 'Jl. Krapyak RT. 30 RW. 03 Cepokomulyo Kec. Kepanjen, Kabupaten Malang',
@@ -149,7 +149,7 @@ class UserSeeder extends Seeder
                 'kecamatan' => 'Gondokusuman',
                 'kelurahan' => 'Klitren',
                 'kode_pos' => '55222',
-                'daerah_sambung' => 'Jojgja 2',
+                'daerah_sambung' => 'Jogja 2',
             ],
             [
                 'nama' => 'PPM Khoirul Huda 2 Keputih Surabaya Tengah',
@@ -200,7 +200,7 @@ class UserSeeder extends Seeder
                 'daerah_sambung' => 'Surabaya Utara',
             ],
             [
-                'nama' => 'PPM Al-Kautsar Malang Tengah',
+                'nama' => 'PPM Al Kautsar Malang Tengah',
                 'status' => 'ppm',
                 'nomor_telepon' => null,
                 'alamat_lengkap' => 'Jl. Jombang III, Gading Kasri, Kec. Klojen, Kota Malang',
@@ -221,7 +221,7 @@ class UserSeeder extends Seeder
                 'kecamatan' => 'Cimahi Selatan',
                 'kelurahan' => 'Cibeber',
                 'kode_pos' => '40631',
-                'daerah_sambung' => 'Cimahi',
+                'daerah_sambung' => 'Bandung Barat',
             ],
             [
                 'nama' => 'PPM Roudhotul Jannah Bandung Selatan',
@@ -233,7 +233,7 @@ class UserSeeder extends Seeder
                 'kecamatan' => 'Dayeuhkolot',
                 'kelurahan' => 'Citereup',
                 'kode_pos' => '40257',
-                'daerah_sambung' => 'Bandung Selatan',
+                'daerah_sambung' => 'Bandung Selatan 2',
             ],
             [
                 'nama' => 'PPM Minhajul Haq Bandung Utara',
